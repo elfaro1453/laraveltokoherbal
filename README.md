@@ -1,12 +1,12 @@
 # Cara Clone Project ini di localhost anda
 
-Pastikan versi php yang telah terinstall di komputer anda adalah minimal versi 7.4, silahkan cek di command line dengan menjalankan kode berikut di command line:
+Pastikan versi php yang telah terinstall di komputer anda adalah minimal versi 7.3, silahkan cek di command line dengan menjalankan kode berikut di command line:
 
 ```php
 php --version
 ```
 
-Jika versi PHP anda di bawah 7.4, update php ke versi terbaru.
+Jika versi PHP anda di bawah 7.3, update php ke versi terbaru.
 
 Kemudian cek versi composer dari command line :
 
