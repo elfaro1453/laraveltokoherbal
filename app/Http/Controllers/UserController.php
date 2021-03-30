@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Validator;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -20,6 +22,23 @@ class UserController extends Controller
         $data = $request->only(['email', 'name', 'password']);
 
         /**
+         * validasi data dari user input
+         */
+        $validator = Validator::make(
+            $data,
+            [
+                'email' => 'required|string|email|unique:App\Models\User,email',
+                'name' => 'required|string|max:255',
+                'password' => 'required|string|min:8'
+            ]
+        );
+        // jika validator gagal untuk memvalidasi, maka munculkan error
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            return response()->json(compact('errors'), 401);
+        }
+
+        /**
          * Buat User sesuai $data tersebut
          */
         $user = new User();
@@ -27,8 +46,57 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
         $user->save();
-        // tampilkan response berisi user, dengan response status code 200 (OK/Sukses)
-        return response()->json(compact('user'), 200);
+
+        /**
+         * Generate token untuk user yang telah dibuat
+         */
+        $token = $user->createToken('api_token')->plainTextToken;
+
+        // tampilkan response berisi user dan token, dengan response status code 200 (OK/Sukses)
+        return response()->json(compact(['user', 'token']), 200);
+    }
+
+    /**
+     * Fungsi untuk login user dan mendapatkan token baru
+     */
+    public function loginUser(Request $request)
+    {
+        // ambil data email dan password saja
+        $data = $request->only(['email', 'password']);
+        // validasi data
+        $validator = Validator::make(
+            $data,
+            [
+                'email' => 'required|string|email',
+                'password' => 'required|string|min:8'
+            ]
+        );
+
+        // jika validator gagal untuk validasi, tampilkan error
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            return response()->json(compact('errors'), 401);
+        }
+
+        // Auth attempt untuk mengecek apakah data (email dan password) sesuai
+        if (Auth::attempt($data)) {
+            $user = User::where('email', $data['email'])->first();
+            $token = $user->createToken('api_token')->plainTextToken;
+            return response()->json(compact(['user', 'token'], 200));
+        }
+    }
+
+    /**
+     * Fungsi untuk logout / menghapus token dari database
+     */
+    public function logoutUser(Request $request)
+    {
+        // expectJson artinya request meminta return berupa JSON
+        if ($request->expectsJson()) {
+            // cek https://laravel.com/docs/8.x/sanctum#revoking-tokens
+            $isTokenDeleted = $request->user()->currentAccessToken()->delete();
+            return response()->json(compact('isTokenDeleted'), 200);
+        }
     }
 
     /**
@@ -72,5 +140,27 @@ class UserController extends Controller
         // selainnya itu sukses
         $resultCode = $user->delete();
         return response()->json(compact('resultCode', 'user'), 200);
+    }
+
+    /**
+     * fungsi untuk mengambil semua user
+     */
+    public function getAllUsers(Request $request)
+    {
+        // cek jika ada query
+        $queryName = $request->name;
+        $queryEmail = $request->email;
+        $users = User::query();
+        if (isset($queryName)) {
+            $users = $users->where('name', 'like', '%' . $queryName . '%');
+        }
+        if (isset($queryEmail)) {
+            $users = $users->where('email', 'like', '%' . $queryEmail . '%');
+        }
+        /** simplePaginate untuk membuat pagination alias membatasi berapa banyak output data dalam satu request */
+        $users = $users->simplePaginate(5);
+        // $users = User::where('name', 'like', '%' . $queryName . '%')->where('email', 'like', '%' . $queryEmail . '%')->simplePaginate(5);
+
+        return response()->json(compact('users'), 200);
     }
 }

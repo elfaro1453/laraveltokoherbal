@@ -20,10 +20,21 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // membuat routing register yang akan menjalankan fungsi registerUser yang ada di UserController
-Route::post('/register', [UserController::class, 'registerUser']);
+Route::post('register', [UserController::class, 'registerUser']);
 
-Route::get('/user/{id}', [UserController::class, 'getUser']);
+Route::post('login', [UserController::class, 'loginUser']);
 
-Route::put('/user/{id}', [UserController::class, 'updateUser']);
+// middleware adalah jembatan dari route ke controller
+Route::post('logout', [UserController::class, 'logoutUser'])->middleware('auth:sanctum');
+
+Route::get('user/all', [UserController::class, 'getAllUsers']);
+
+Route::get('user/{id}', [UserController::class, 'getUser']);
+
+Route::put('user/{id}', [UserController::class, 'updateUser']);
 
 Route::delete('user/{id}', [UserController::class, 'deleteUser']);
+
+Route::get('user', function () {
+    return response()->json('', 403);
+});
