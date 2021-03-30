@@ -40,9 +40,9 @@ pada command line jalankan perintah berikut :
 
 ```php
 php -r "file_exists('.env') || copy('.env.example', '.env');"
+composer install
 php artisan package:discover --ansi
 php artisan key:generate
-composer install
 npm install
 npm run dev
 ```
