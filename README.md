@@ -27,7 +27,7 @@ Jika tools telah terinstall dengan baik, maka selanjutnya adalah mengcopy projec
 Pada command line / terminal, git clone repository ini di workfolder anda, semisal di dalam folder htdocs
 
 ```php
-git clone https://github.com/elfaro1453/belajarlaravel.git laravel
+git clone https://github.com/elfaro1453/laraveltokoherbal.git laravel
 ```
 
 Kemudian masuk ke folder yang telah dibuat tadi
