@@ -122,8 +122,31 @@ class UserController extends Controller
         $user = User::find($id);
         // jadikan object request menjadi array input
         $input = $request->all();
-        // modifikasi user bagian nama
-        $user->name = $input['name'];
+        // add validator untuk keamanan
+        $validator = Validator::make(
+            $input,
+            [
+                'name' => 'nullable|string|max:255',
+                'photo' => 'nullable|file|image|max:2048',
+                'phone_number' => 'nullable|string|max:15',
+            ]
+        );
+
+        // jika validator gagal untuk validasi, tampilkan error
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            return response()->json(compact('errors'), 401);
+        }
+
+        if (isset($request->name)) {
+            // modifikasi user bagian nama
+            $user->name = $input['name'];
+        }
+        if (isset($request->phone_number)) {
+            // modifikasi user bagian phone_number
+            $user->phone_number = $input['phone_number'];
+        }
+
         // cek apakah file yang diupload itu ada
         // diketahui dari adanya response dengan key tertentu semisal photo
         if ($request->has('photo')) {
@@ -135,6 +158,7 @@ class UserController extends Controller
         }
         // simpan user
         $user->save();
+
         //return user yang telah diupdate
         return response()->json(compact('user'), 200);
     }
