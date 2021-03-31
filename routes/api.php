@@ -31,7 +31,7 @@ Route::get('user/all', [UserController::class, 'getAllUsers']);
 
 Route::get('user/{id}', [UserController::class, 'getUser']);
 
-Route::put('user/{id}', [UserController::class, 'updateUser']);
+Route::post('user/{id}', [UserController::class, 'updateUser']);
 
 Route::delete('user/{id}', [UserController::class, 'deleteUser']);
 

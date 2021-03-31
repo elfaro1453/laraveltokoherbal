@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use Validator;
+use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -118,11 +120,21 @@ class UserController extends Controller
     {
         // cari user yang akan diupdate, berdasarkan id
         $user = User::find($id);
+        // jadikan object request menjadi array input
+        $input = $request->all();
         // modifikasi user bagian nama
-        $user->name = $request->name;
+        $user->name = $input['name'];
+        // cek apakah file yang diupload itu ada
+        // diketahui dari adanya response dengan key tertentu semisal photo
+        if ($request->has('photo')) {
+            if (isset($user->profile_photo_path) || !empty($user->profile_photo_path)) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+            $urlPath = $request->file('photo')->store('images/'. $id, 'public');
+            $user->profile_photo_path = $urlPath;
+        }
         // simpan user
         $user->save();
-
         //return user yang telah diupdate
         return response()->json(compact('user'), 200);
     }
