@@ -18,4 +18,13 @@ class Alamat extends Model
         'desa',
         'kodepos',
     ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'user_id' => 'integer',
+    ];
 }

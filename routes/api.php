@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AlamatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -38,3 +39,12 @@ Route::delete('user/{id}', [UserController::class, 'deleteUser']);
 Route::get('user', function () {
     return response()->json('', 403);
 });
+
+// rute untuk mendapatkan alamat berdasarkan user_id
+Route::get('user/{user_id}/alamat', [AlamatController::class, 'getAlamat']);
+
+// rute create dan update alamat berdasarakan user_id
+Route::post('user/{user_id}/alamat', [AlamatController::class, 'createAlamat']);
+
+// rute hapus alamat berdasarakan user_id
+Route::delete('user/{user_id}/alamat', [AlamatController::class, 'hapusAlamat']);

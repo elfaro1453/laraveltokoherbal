@@ -109,6 +109,7 @@ class UserController extends Controller
     {
         // https://laravel.com/docs/8.x/eloquent#retrieving-single-models
         $user = User::find($id);
+        $user->alamat;
         return response()->json(compact('user'), 200);
     }
 
@@ -175,6 +176,11 @@ class UserController extends Controller
         // jika gagal kodenya adalah false
         // selainnya itu sukses
         $resultCode = $user->delete();
+
+        // selain menghapus user dari database, kita perlu jg menghapus gambar user tersebut
+        if (isset($user->profile_photo_path) || !empty($user->profile_photo_path)) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
         return response()->json(compact('resultCode', 'user'), 200);
     }
 
