@@ -109,7 +109,7 @@ class UserController extends Controller
     {
         // https://laravel.com/docs/8.x/eloquent#retrieving-single-models
         $user = User::find($id);
-        $user->alamat;
+        // $user->alamat;
         return response()->json(compact('user'), 200);
     }
 
